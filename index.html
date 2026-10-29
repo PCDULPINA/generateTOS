@@ -1,0 +1,2049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TOS & Item Analysis Pro: Contextualized for DepEd Elementary</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- PDF export for generated assessment copies -->
+  <script id="html2pdf-first-app" src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            deped: {
+              darkViolet: '#2b1055',
+              mediumViolet: '#59257c',
+              lightViolet: '#753a88',
+              bgLight: '#f8fafc',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8fafc;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #c7d2fe;
+      border-radius: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #818cf8;
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      body {
+        background-color: white !important;
+        color: black !important;
+      }
+      .page-break {
+        page-break-before: always;
+      }
+      .print-signatories { display: none; }
+      @media print {
+        .print-signatories {
+          display: block !important;
+          margin: 34px auto 0;
+          padding-top: 8px;
+          color: #111 !important;
+          font-family: Arial, Helvetica, sans-serif;
+          break-inside: avoid !important;
+          page-break-inside: avoid !important;
+          width: 100%;
+        }
+        .print-signatories-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 28px;
+          align-items: start;
+          break-inside: avoid;
+          page-break-inside: avoid;
+        }
+        .print-signatory { text-align: center; min-width: 0; }
+        .print-signature-line { border-bottom: 1px solid #111; height: 28px; margin: 0 8px 6px; }
+        .print-signatory-label { font-weight: 700; margin-bottom: 8px; }
+        .print-signatory-name { font-size: 11pt; margin-top: 2px; }
+        .print-signatory-role { font-size: 10pt; margin-top: 2px; }
+        .print-developer { text-align: center; margin-top: 26px; font-size: 9pt; }
+      }
+      .pdf-exporting .print-signatories { display: block !important; }
+      .pdf-exporting .print-signatories-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+      .pdf-exporting .print-signatory { text-align: center; }
+      .pdf-exporting .print-signature-line { border-bottom: 1px solid #111; height: 28px; margin: 0 8px 6px; }
+      .pdf-exporting .print-developer { text-align: center; margin-top: 26px; }
+    }
+  </style>
+</head>
+<body class="text-gray-800 flex flex-col min-h-screen">
+
+  <!-- TOP HEADER / NAV -->
+  <header class="bg-deped-darkViolet text-white shadow-lg no-print">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-white/10 p-2.5 rounded-lg border border-white/20">
+          <i class="fa-solid me-1 fa-book-open text-yellow-400 text-2xl"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg md:text-xl leading-tight">TOS & Item Analysis Pro</h1>
+          <p class="text-xs text-purple-200">Contextualized for DepEd Elementary</p>
+        </div>
+      </div>
+
+      <!-- Upper Attribution -->
+      <div class="text-center md:text-right text-xs bg-white/10 px-4 py-2 rounded-lg border border-white/15">
+        <span class="text-purple-300 block font-semibold text-[10px] uppercase tracking-wider">Developer Attribution</span>
+        <span class="font-bold text-yellow-300">PRISCO C. DULPINA</span>
+        <span class="block text-gray-200">School Head</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- SUBHEADER DISCLAIMER BAR -->
+  <div class="bg-yellow-100 border-b border-yellow-300 text-yellow-900 text-xs py-2 px-4 no-print text-center">
+    <i class="fa-solid fa-triangle-exclamation text-yellow-600 mr-1"></i>
+    <strong>Disclaimer:</strong> This application is an independent educational assessment tool and is not an official Department of Education (DepEd) system. Users should verify applicable DepEd policies, curriculum guides, and assessment guidelines before official use.
+  </div>
+
+  <!-- MAIN WRAPPER -->
+  <div class="max-w-7xl mx-auto px-4 py-6 flex-1 w-full flex flex-col">
+
+    <!-- NAVIGATION WORKFLOW PROGRESS -->
+    <nav class="bg-white rounded-xl shadow-sm border border-gray-200 p-3 mb-6 no-print custom-scrollbar overflow-x-auto">
+      <div class="flex items-center space-x-2 min-w-max text-xs font-medium">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active-tab bg-deped-mediumViolet text-white px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <i class="fa-solid fa-chart-line"></i><span>Dashboard</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        <button onclick="switchTab('step1')" id="tab-step1" class="tab-btn text-gray-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <span>1. Profile</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        <button onclick="switchTab('step2')" id="tab-step2" class="tab-btn text-gray-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <span>2. Competencies</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        <button onclick="switchTab('step3')" id="tab-step3" class="tab-btn text-gray-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <span>3. Time & Weight</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        <button onclick="switchTab('step4')" id="tab-step4" class="tab-btn text-gray-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <span>4. Cognitive Levels</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        <button onclick="switchTab('step5')" id="tab-step5" class="tab-btn text-gray-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <span>5. TOS Matrix</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        <button onclick="switchTab('step6')" id="tab-step6" class="tab-btn text-gray-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <span>6. Item Bank</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        <button onclick="switchTab('step7')" id="tab-step7" class="tab-btn text-gray-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <span>7. Responses</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        <button onclick="switchTab('step8')" id="tab-step8" class="tab-btn text-gray-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <span>8. Item Analysis</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        <button onclick="switchTab('step9')" id="tab-step9" class="tab-btn text-gray-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <span>9. Gap & Remediation</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-gray-300"></i>
+        <button onclick="switchTab('about')" id="tab-about" class="tab-btn text-gray-600 hover:bg-purple-50 px-3 py-2 rounded-lg transition flex items-center space-x-1">
+          <i class="fa-solid fa-circle-info"></i><span>About</span>
+        </button>
+      </div>
+    </nav>
+
+    <!-- CONTENT MODULE CONTAINERS -->
+
+    <!-- DASHBOARD SECTION -->
+    <section id="sec-dashboard" class="tab-content space-y-6">
+      <div class="bg-gradient-to-r from-deped-darkViolet to-deped-lightViolet rounded-2xl p-6 text-white shadow-md flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h2 class="text-2xl font-bold mb-1">Assessment Management Dashboard</h2>
+          <p class="text-purple-200 text-sm">Contextualized for Philippine DepEd Elementary Assessment Standards</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button onclick="loadDemoData()" class="bg-yellow-400 hover:bg-yellow-300 text-deped-darkViolet font-bold px-4 py-2 rounded-lg text-xs transition shadow flex items-center gap-1">
+            <i class="fa-solid fa-flask"></i> Load Demo Assessment
+          </button>
+          <button onclick="resetAssessment()" class="bg-red-500/80 hover:bg-red-600 text-white font-semibold px-3 py-2 rounded-lg text-xs transition flex items-center gap-1">
+            <i class="fa-solid fa-rotate-right"></i> Reset
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Target Test Items</p>
+            <p id="dash-total-items" class="text-2xl font-extrabold text-deped-darkViolet">0</p>
+          </div>
+          <div class="bg-purple-100 text-deped-mediumViolet p-3 rounded-lg"><i class="fa-solid fa-list-check text-xl"></i></div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Competencies</p>
+            <p id="dash-competencies-count" class="text-2xl font-extrabold text-blue-600">0</p>
+          </div>
+          <div class="bg-blue-100 text-blue-600 p-3 rounded-lg"><i class="fa-solid fa-book text-xl"></i></div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Total Learners</p>
+            <p id="dash-learners-count" class="text-2xl font-extrabold text-emerald-600">0</p>
+          </div>
+          <div class="bg-emerald-100 text-emerald-600 p-3 rounded-lg"><i class="fa-solid fa-users text-xl"></i></div>
+        </div>
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex items-center justify-between">
+          <div>
+            <p class="text-xs text-gray-500 font-medium">Class MPS</p>
+            <p id="dash-mps" class="text-2xl font-extrabold text-amber-600">0.00%</p>
+          </div>
+          <div class="bg-amber-100 text-amber-600 p-3 rounded-lg"><i class="fa-solid fa-chart-pie text-xl"></i></div>
+        </div>
+      </div>
+
+      <!-- Active Profile Overview Card -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-gray-800 text-base border-l-4 border-deped-mediumViolet pl-3">Active Assessment Profile</h3>
+          <button onclick="switchTab('step1')" class="text-xs text-deped-mediumViolet hover:underline font-semibold">Edit Details</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div><span class="text-gray-500 block text-xs">School Name:</span><span id="dash-school" class="font-semibold text-gray-800">--</span></div>
+          <div><span class="text-gray-500 block text-xs">Subject & Grade:</span><span id="dash-subject-grade" class="font-semibold text-gray-800">--</span></div>
+          <div><span class="text-gray-500 block text-xs">Quarter & Year:</span><span id="dash-quarter-year" class="font-semibold text-gray-800">--</span></div>
+          <div><span class="text-gray-500 block text-xs">Assessment Title:</span><span id="dash-exam-title" class="font-semibold text-gray-800">--</span></div>
+          <div><span class="text-gray-500 block text-xs">Prepared By:</span><span id="dash-teacher" class="font-semibold text-gray-800">--</span></div>
+          <div><span class="text-gray-500 block text-xs">Assessment Type:</span><span id="dash-exam-type" class="font-semibold text-gray-800">--</span></div>
+        </div>
+      </div>
+
+      <!-- System Quality Status -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="font-bold text-gray-800 text-base mb-3 border-l-4 border-emerald-500 pl-3">Assessment Quality Status</h3>
+        <div id="quality-status-box" class="p-4 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-900 text-sm">
+          <p class="font-bold flex items-center gap-2">
+            <i class="fa-solid fa-circle-check text-emerald-600"></i> Assessment Blueprint Ready
+          </p>
+          <p class="text-xs text-emerald-700 mt-1">Configure competencies, verify item counts, and load learner scores to view auto-generated analysis reports.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 1: EXAM PROFILE -->
+    <section id="sec-step1" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="border-b pb-4 mb-6">
+          <h2 class="text-lg font-bold text-deped-darkViolet">Step 1: Exam Profile Header Setup</h2>
+          <p class="text-xs text-gray-500">Specify institutional metadata aligned with DepEd assessment documentation.</p>
+        </div>
+
+        <form id="form-profile" class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm" onsubmit="event.preventDefault(); saveProfile();">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Region</label>
+            <input type="text" id="prof-region" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" placeholder="e.g. Region X - Northern Mindanao"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Schools Division</label>
+            <input type="text" id="prof-division" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" placeholder="e.g. Division of Cagayan de Oro"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">District</label>
+            <input type="text" id="prof-district" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" placeholder="e.g. North District"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">School Name</label>
+            <input type="text" id="prof-school" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" placeholder="e.g. Central Elementary School"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">School ID</label>
+            <input type="text" id="prof-school-id" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" placeholder="e.g. 101234"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">School Year</label>
+            <input type="text" id="prof-sy" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" placeholder="e.g. 2025-2026"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Grade Level</label>
+            <select id="prof-grade" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none">
+              <option value="Grade 2">Grade 2</option>
+              <option value="Grade 3">Grade 3</option>
+              <option value="Grade 4">Grade 4</option>
+              <option value="Grade 5" selected>Grade 5</option>
+              <option value="Grade 6">Grade 6</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Section</label>
+            <input type="text" id="prof-section" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" placeholder="e.g. Sampaguita"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Learning Area / Subject</label>
+            <select id="prof-subject" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none">
+              <option value="Mathematics" selected>Mathematics</option>
+              <option value="English">English</option>
+              <option value="Filipino">Filipino</option>
+              <option value="Science">Science</option>
+              <option value="Araling Panlipunan">Araling Panlipunan</option>
+              <option value="Makabansa">Makabansa</option>
+              <option value="GMRC / Values Education">GMRC / Values Education</option>
+              <option value="MAPEH">MAPEH</option>
+              <option value="EPP / TLE">EPP / TLE</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Term Period</label>
+            <select id="prof-term" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none">
+              <option value="Term 1" selected>Term 1</option>
+              <option value="Term 2">Term 2</option>
+              <option value="Term 3">Term 3</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Assessment Type</label>
+            <select id="prof-type" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none">
+              <option value="TERM EXAMINATION" selected>TERM EXAMINATION</option>
+              <option value="Diagnostic">Diagnostic</option>
+              <option value="Formative">Formative</option>
+              <option value="Summative">Summative</option>
+              <option value="Unit Test">Unit Test</option>
+              <option value="Pre-Test">Pre-Test</option>
+              <option value="Post-Test">Post-Test</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Total Target Test Items</label>
+            <input type="number" id="prof-total-items" min="5" max="100" value="40" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Exam Title</label>
+            <input type="text" id="prof-title" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" value="First Quarter Examination in Mathematics 5"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Prepared By (Teacher)</label>
+            <input type="text" id="prof-teacher" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" placeholder="e.g. Maria Clara, T-III"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Checked By (Master Teacher)</label>
+            <input type="text" id="prof-checked" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" placeholder="e.g. Juan Luna, MT-I"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Approved By (School Head)</label>
+            <input type="text" id="prof-approved" class="w-full border rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-purple-400 outline-none" value="PRISCO C. DULPINA, School Head"/>
+          </div>
+
+          <div class="md:col-span-3 flex justify-end space-x-2 mt-4">
+            <button type="button" onclick="saveProfile()" class="bg-deped-mediumViolet hover:bg-deped-darkViolet text-white font-semibold px-6 py-2 rounded-lg text-sm transition shadow">
+              Save Exam Profile & Proceed <i class="fa-solid fa-arrow-right ml-1"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- STEP 2: COMPETENCIES MANAGER -->
+    <section id="sec-step2" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-deped-darkViolet">Step 2: Learning Competencies</h2>
+            <p class="text-xs text-gray-500">Manage learning standards and competency codes for the assessment period.</p>
+          </div>
+          <button onclick="openCompetencyModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+            <i class="fa-solid fa-plus"></i> Add Competency
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-purple-50 text-deped-darkViolet border-b">
+                <th class="p-3">Code</th>
+                <th class="p-3">Learning Competency</th>
+                <th class="p-3">Topic / Content Area</th>
+                <th class="p-3 text-center">Hours</th>
+                <th class="p-3 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="competency-table-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 3: TOPICS AND TIME ALLOTMENT -->
+    <section id="sec-step3" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-bold text-deped-darkViolet">Step 3: Topics & Time Allotment</h2>
+          <p class="text-xs text-gray-500">Calculates item weights dynamically based on total instructional hours.</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-purple-50 text-deped-darkViolet border-b">
+                <th class="p-3">Topic / Content Area</th>
+                <th class="p-3 text-center">Instructional Hours</th>
+                <th class="p-3 text-center">Percentage Weight</th>
+                <th class="p-3 text-center">Computed Target Items</th>
+              </tr>
+            </thead>
+            <tbody id="topic-weight-table">
+              <!-- Dynamic content -->
+            </tbody>
+            <tfoot>
+              <tr class="font-bold bg-gray-50 text-gray-800 border-t">
+                <td class="p-3">Total</td>
+                <td id="weight-total-hours" class="p-3 text-center">0</td>
+                <td id="weight-total-percent" class="p-3 text-center">0%</td>
+                <td id="weight-total-items" class="p-3 text-center">0</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-900 text-xs">
+          <strong>Formula applied:</strong> Weight (%) = (Topic Hours / Total Instructional Hours) &times; 100. Item allocation uses the Largest Remainder Rounding Method to ensure exact item counts.
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 4: COGNITIVE LEVELS -->
+    <section id="sec-step4" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-bold text-deped-darkViolet">Step 4: Cognitive Domain Distribution</h2>
+          <p class="text-xs text-gray-500">Configure Bloom's / Marzano's Revised Taxonomy proportions across test items.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-sm">
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Remembering (%)</label>
+            <input type="number" id="cog-remember" onchange="updateCognitiveWeights()" value="20" class="w-full border rounded-lg px-3 py-2 text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Understanding (%)</label>
+            <input type="number" id="cog-understand" onchange="updateCognitiveWeights()" value="20" class="w-full border rounded-lg px-3 py-2 text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Applying (%)</label>
+            <input type="number" id="cog-apply" onchange="updateCognitiveWeights()" value="15" class="w-full border rounded-lg px-3 py-2 text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Analyzing (%)</label>
+            <input type="number" id="cog-analyze" onchange="updateCognitiveWeights()" value="15" class="w-full border rounded-lg px-3 py-2 text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Evaluating (%)</label>
+            <input type="number" id="cog-evaluate" onchange="updateCognitiveWeights()" value="15" class="w-full border rounded-lg px-3 py-2 text-sm"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-700 mb-1">Creating (%)</label>
+            <input type="number" id="cog-create" onchange="updateCognitiveWeights()" value="15" class="w-full border rounded-lg px-3 py-2 text-sm"/>
+          </div>
+        </div>
+
+        <div id="cog-weight-status" class="p-3 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-100">
+          Total Cognitive Distribution Weight: 100% (Valid)
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 5: TOS GENERATOR MATRIX -->
+    <section id="sec-step5" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex flex-col md:flex-row justify-between md:items-center border-b pb-4 mb-4 gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-deped-darkViolet">Step 5: Table of Specifications (TOS) Blueprint</h2>
+            <p class="text-xs text-gray-500">Auto-balanced matrix displaying item placement targets across cognitive domains.</p>
+          </div>
+          <button onclick="window.print()" class="bg-gray-800 hover:bg-black text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+            <i class="fa-solid fa-print"></i> Print TOS Blueprint
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-deped-darkViolet text-white">
+                <th class="p-2 border border-purple-900">Topic / Competency</th>
+                <th class="p-2 border border-purple-900 text-center">Hours</th>
+                <th class="p-2 border border-purple-900 text-center">% Weight</th>
+                <th class="p-2 border border-purple-900 text-center bg-purple-800">Rem</th>
+                <th class="p-2 border border-purple-900 text-center bg-purple-800">Und</th>
+                <th class="p-2 border border-purple-900 text-center bg-purple-800">App</th>
+                <th class="p-2 border border-purple-900 text-center bg-purple-800">Ana</th>
+                <th class="p-2 border border-purple-900 text-center bg-purple-800">Eva</th>
+                <th class="p-2 border border-purple-900 text-center bg-purple-800">Cre</th>
+                <th class="p-2 border border-purple-900 text-center">Total Items</th>
+              </tr>
+            </thead>
+            <tbody id="tos-matrix-body">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+        <div id="tos-signatories" class="print-signatories"></div>
+      </div>
+    </section>
+
+    <!-- STEP 6: ITEM BANK CONSTRUCTION -->
+    <section id="sec-step6" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex justify-between items-center border-b pb-4 mb-4">
+          <div>
+            <h2 class="text-lg font-bold text-deped-darkViolet">Step 6: Item Construction & Bank</h2>
+            <p class="text-xs text-gray-500">Construct, review, and align assessment items with TOS specifications.</p>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <button onclick="openItemModal()" class="bg-deped-mediumViolet hover:bg-deped-darkViolet text-white px-3 py-2 rounded-lg text-xs font-semibold transition flex items-center gap-1">
+              <i class="fa-solid fa-plus"></i> Add Item
+            </button>
+            <button onclick="printFullItemBank()" class="bg-gray-800 hover:bg-black text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-print mr-1"></i> Print Item Bank</button>
+            <button onclick="exportItemBankPDF()" class="bg-red-700 hover:bg-red-800 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-file-pdf mr-1"></i> Export Assessment PDF</button>
+            <button onclick="exportItemBankExcel()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-file-excel mr-1"></i> Export Excel</button>
+            <button onclick="exportItemBankWord()" class="bg-blue-700 hover:bg-blue-800 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-file-word mr-1"></i> Export Word</button>
+            <button onclick="saveDataLocally()" class="bg-amber-500 hover:bg-amber-600 text-white px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-download mr-1"></i> Save Data</button>
+            <button onclick="document.getElementById('load-data-file').click()" class="bg-purple-100 hover:bg-purple-200 text-deped-darkViolet px-3 py-2 rounded-lg text-xs font-semibold"><i class="fa-solid fa-folder-open mr-1"></i> Load Data</button>
+            <input id="load-data-file" type="file" accept=".json,application/json" class="hidden" onchange="loadDataLocally(event)">
+          </div>
+        </div>
+
+        <div class="mb-3 flex flex-wrap items-center gap-2 text-xs">
+          <label for="insert-item-position" class="font-semibold text-gray-700">Add item at position:</label>
+          <input id="insert-item-position" type="number" min="1" value="1" class="w-20 border rounded-lg px-2 py-1">
+          <button onclick="addItemAtPosition()" class="bg-purple-100 hover:bg-purple-200 text-deped-darkViolet px-3 py-2 rounded-lg font-semibold"><i class="fa-solid fa-arrow-down-wide-short mr-1"></i> Add Item Here</button>
+          <span class="text-gray-500">Items are automatically renumbered after insertion or deletion.</span>
+        </div>
+        <div id="item-bank-list" class="space-y-4">
+          <!-- Dynamic test items -->
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 7: LEARNER RESPONSE ENTRY -->
+    <section id="sec-step7" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="flex flex-col md:flex-row justify-between border-b pb-4 mb-4 gap-2">
+          <div>
+            <h2 class="text-lg font-bold text-deped-darkViolet">Step 7: Learner Response Matrix</h2>
+            <p class="text-xs text-gray-500">Record score items (1 = Correct, 0 = Incorrect) for classroom data processing.</p>
+          </div>
+          <button onclick="addLearnerRow()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-lg text-xs font-semibold transition self-start flex items-center gap-1">
+            <i class="fa-solid fa-user-plus"></i> Add Learner Row
+          </button>
+        </div>
+
+        <div class="overflow-x-auto custom-scrollbar">
+          <table class="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr id="response-header-row" class="bg-purple-100 text-deped-darkViolet border-b">
+                <th class="p-2 min-w-[150px] border">Learner Name</th>
+                <!-- Item headers appended via JS -->
+              </tr>
+            </thead>
+            <tbody id="response-table-body">
+              <!-- Dynamic Rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 8: ITEM ANALYSIS ENGINE -->
+    <section id="sec-step8" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-bold text-deped-darkViolet">Step 8: Psychometric Item Analysis</h2>
+          <p class="text-xs text-gray-500">Calculates Difficulty Index (p) and Discrimination Index (D) based on Upper/Lower 27% groups.</p>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-deped-darkViolet text-white">
+                <th class="p-2 border">Item #</th>
+                <th class="p-2 border text-center">Correct</th>
+                <th class="p-2 border text-center">Diff Index (p)</th>
+                <th class="p-2 border">Difficulty Rating</th>
+                <th class="p-2 border text-center">Disc Index (D)</th>
+                <th class="p-2 border">Discrimination Status</th>
+                <th class="p-2 border text-center">Action Recommendation</th>
+              </tr>
+            </thead>
+            <tbody id="item-analysis-table-body">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+        <div id="analysis-signatories" class="print-signatories"></div>
+      </div>
+    </section>
+
+    <!-- STEP 9: LEARNING GAP & REMEDIATION PLANNER -->
+    <section id="sec-step9" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <div class="border-b pb-4 mb-4">
+          <h2 class="text-lg font-bold text-deped-darkViolet">Step 9: Learning Gap Analysis & Instructional Remediation</h2>
+          <p class="text-xs text-gray-500">Identifies unmastered learning competencies and recommends targeted intervention strategies.</p>
+        </div>
+
+        <div id="gap-remediation-container" class="space-y-6">
+          <!-- Dynamic Remediation Cards -->
+        </div>
+        <div id="gap-signatories" class="print-signatories"></div>
+      </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="sec-about" class="tab-content hidden space-y-6">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+        <h2 class="text-xl font-bold text-deped-darkViolet">About the Application</h2>
+        <div class="text-xs space-y-2 text-gray-700 leading-relaxed">
+          <p><strong>APPLICATION NAME:</strong> DepEd Elementary TOS & Item Analysis Pro</p>
+          <p><strong>DESCRIPTION:</strong> An educational assessment decision-support tool designed to assist elementary teachers in developing Tables of Specifications, constructing assessment items, analyzing test results, identifying learning gaps, and planning appropriate instructional interventions.</p>
+          <p><strong>DEVELOPER:</strong> PRISCO C. DULPINA</p>
+          <p><strong>POSITION:</strong> School Head</p>
+          <p><strong>VERSION:</strong> 1.0.4 (2026 Build)</p>
+          <p><strong>YEAR:</strong> 2026</p>
+        </div>
+
+        <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-900 text-xs">
+          <strong>IMPORTANT DISCLAIMER:</strong> This application is an independently developed educational assessment tool. It is not an official Department of Education (DepEd) application, website, or government-issued assessment system. DepEd policies, curriculum guides, assessment guidelines, and other official issuances should be verified through appropriate official DepEd sources before use.
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-gray-100 border-t border-gray-200 py-4 text-center text-xs text-gray-600 no-print mt-auto">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="font-semibold text-gray-700">DepEd Elementary TOS & Item Analysis Pro</p>
+      <p>Developed by <span class="font-bold text-deped-mediumViolet">PRISCO C. DULPINA</span>, School Head</p>
+      <p class="text-[10px] text-gray-400 mt-1">Independent Educational Assessment Decision-Support System</p>
+    </div>
+  </footer>
+
+  <!-- SCRIPT / APPLICATION LOGIC -->
+  <script>
+    // CORE APPLICATION STATE
+    let appState = {
+      profile: {
+        region: 'Region X - Northern Mindanao',
+        division: 'Division of Cagayan de Oro',
+        district: 'North District',
+        school: 'Central Elementary School',
+        schoolId: '101234',
+        sy: '2025-2026',
+        grade: 'Grade 5',
+        section: 'Sampaguita',
+        subject: 'Mathematics',
+        term: 'Term 1',
+        type: 'TERM EXAMINATION',
+        totalItems: 40,
+        title: 'First Quarter Examination in Mathematics 5',
+        teacher: 'Maria Clara, T-III',
+        checked: 'Juan Luna, MT-I',
+        approved: 'PRISCO C. DULPINA, School Head'
+      },
+      competencies: [],
+      cogWeights: { rem: 20, und: 20, app: 15, ana: 15, eva: 15, cre: 15 },
+      items: [],
+      learners: []
+    };
+
+    // INITIALIZATION
+    window.addEventListener('DOMContentLoaded', () => {
+      let restored = false;
+      try {
+        const saved = localStorage.getItem('tosItemAnalysisProData');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && parsed.profile && Array.isArray(parsed.items) && Array.isArray(parsed.learners)) {
+            appState = parsed;
+            appState.competencies = Array.isArray(appState.competencies) ? appState.competencies : [];
+            appState.cogWeights = appState.cogWeights || { rem: 20, und: 20, app: 15, ana: 15, eva: 15, cre: 15 };
+            // Migrate older saved profile terms to the current three-term choices.
+            const savedTerm = String(appState.profile.term || 'Term 1');
+            appState.profile.term = savedTerm.includes('Term 2') ? 'Term 2' : savedTerm.includes('Term 3') || savedTerm.includes('Term 4') ? 'Term 3' : 'Term 1';
+            appState.profile.approved = 'PRISCO C. DULPINA, School Head';
+            restored = true;
+          }
+        }
+      } catch (e) {}
+      if (!restored) loadDemoData();
+      renderAll();
+    });
+
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(el => {
+        el.classList.remove('active-tab', 'bg-deped-mediumViolet', 'text-white');
+        el.classList.add('text-gray-600');
+      });
+
+      const targetSec = document.getElementById('sec-' + tabId);
+      const targetBtn = document.getElementById('tab-' + tabId);
+
+      if (targetSec) targetSec.classList.remove('hidden');
+      if (targetBtn) {
+        targetBtn.classList.add('active-tab', 'bg-deped-mediumViolet', 'text-white');
+        targetBtn.classList.remove('text-gray-600');
+      }
+    }
+
+    // DEMO DATA GENERATOR
+    function loadDemoData() {
+      appState.competencies = [
+        { id: 'C1', code: 'M5NS-Ia-1', text: 'Identifies and compares whole numbers up to 10,000,000.', topic: 'Whole Numbers', hours: 5 },
+        { id: 'C2', code: 'M5NS-Ib-2', text: 'Adds and subtracts fractions with unlike denominators.', topic: 'Fractions', hours: 4 },
+        { id: 'C3', code: 'M5NS-Ic-3', text: 'Solves word problems involving decimals and money.', topic: 'Decimals', hours: 4 },
+        { id: 'C4', code: 'M5GE-Id-4', text: 'Visualizes and describes polygons and circles.', topic: 'Geometry', hours: 3 },
+        { id: 'C5', code: 'M5ME-Ie-5', text: 'Calculates area and perimeter of complex shapes.', topic: 'Measurement', hours: 4 }
+      ];
+
+      // Sample 40 items
+      appState.items = [];
+      const topics = ['Whole Numbers', 'Fractions', 'Decimals', 'Geometry', 'Measurement'];
+      for (let i = 1; i <= 40; i++) {
+        const tIndex = (i - 1) % 5;
+        appState.items.push({
+          id: i,
+          number: i,
+          question: `Sample test item text for Question #${i}?`,
+          topic: topics[tIndex],
+          cogLevel: i % 3 === 0 ? 'Apply' : (i % 2 === 0 ? 'Understand' : 'Remember'),
+          key: 'A'
+        });
+      }
+
+      // Sample 30 learners scores
+      appState.learners = [];
+      for (let l = 1; l <= 30; l++) {
+        const scores = {};
+        for (let i = 1; i <= 40; i++) {
+          // high performing learners get higher scores
+          const prob = l > 20 ? 0.85 : (l < 10 ? 0.45 : 0.65);
+          scores[i] = Math.random() < prob ? 1 : 0;
+        }
+        appState.learners.push({ id: l, name: `Learner ${l}`, scores: scores });
+      }
+
+      renderAll();
+    }
+
+    function resetAssessment() {
+      if (confirm('Are you sure you want to reset all assessment data?')) {
+        appState.competencies = [];
+        appState.items = [];
+        appState.learners = [];
+        renderAll();
+      }
+    }
+
+    // RENDER CONTROLLERS
+    function renderAll() {
+      ['tos-signatories','analysis-signatories','gap-signatories'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.innerHTML = printSignatoriesHtml();
+      });
+      renderProfileForm();
+      renderDashboard();
+      renderCompetencies();
+      renderTopicWeights();
+      renderTOSMatrix();
+      renderItemBank();
+      renderResponses();
+      renderItemAnalysis();
+      renderGapAnalysis();
+      try { localStorage.setItem('tosItemAnalysisProData', JSON.stringify(appState)); } catch (e) {}
+    }
+
+    function renderProfileForm() {
+      const p = appState.profile;
+      document.getElementById('prof-region').value = p.region;
+      document.getElementById('prof-division').value = p.division;
+      document.getElementById('prof-district').value = p.district;
+      document.getElementById('prof-school').value = p.school;
+      document.getElementById('prof-school-id').value = p.schoolId;
+      document.getElementById('prof-sy').value = p.sy;
+      document.getElementById('prof-grade').value = p.grade;
+      document.getElementById('prof-section').value = p.section;
+      document.getElementById('prof-subject').value = p.subject;
+      document.getElementById('prof-term').value = p.term;
+      document.getElementById('prof-type').value = p.type;
+      document.getElementById('prof-total-items').value = p.totalItems;
+      document.getElementById('prof-title').value = p.title;
+      document.getElementById('prof-teacher').value = p.teacher;
+      document.getElementById('prof-checked').value = p.checked;
+      document.getElementById('prof-approved').value = p.approved;
+    }
+
+    function saveProfile() {
+      const p = appState.profile;
+      p.region = document.getElementById('prof-region').value;
+      p.division = document.getElementById('prof-division').value;
+      p.district = document.getElementById('prof-district').value;
+      p.school = document.getElementById('prof-school').value;
+      p.schoolId = document.getElementById('prof-school-id').value;
+      p.sy = document.getElementById('prof-sy').value;
+      p.grade = document.getElementById('prof-grade').value;
+      p.section = document.getElementById('prof-section').value;
+      p.subject = document.getElementById('prof-subject').value;
+      p.term = document.getElementById('prof-term').value;
+      p.type = document.getElementById('prof-type').value;
+      p.totalItems = parseInt(document.getElementById('prof-total-items').value) || 40;
+      p.title = document.getElementById('prof-title').value;
+      p.teacher = document.getElementById('prof-teacher').value;
+      p.checked = document.getElementById('prof-checked').value;
+      p.approved = document.getElementById('prof-approved').value;
+
+      renderDashboard();
+      switchTab('step2');
+    }
+
+    function renderDashboard() {
+      const p = appState.profile;
+      document.getElementById('dash-total-items').textContent = p.totalItems;
+      document.getElementById('dash-competencies-count').textContent = appState.competencies.length;
+      document.getElementById('dash-learners-count').textContent = appState.learners.length;
+      document.getElementById('dash-school').textContent = p.school || '--';
+      document.getElementById('dash-subject-grade').textContent = `${p.subject} (${p.grade})`;
+      document.getElementById('dash-quarter-year').textContent = `${p.term} | ${p.sy}`;
+      document.getElementById('dash-exam-title').textContent = p.title;
+      document.getElementById('dash-teacher').textContent = p.teacher;
+      document.getElementById('dash-exam-type').textContent = p.type;
+
+      // Compute MPS
+      if (appState.learners.length > 0 && p.totalItems > 0) {
+        let totalScoreSum = 0;
+        appState.learners.forEach(l => {
+          let s = 0;
+          for (let i = 1; i <= p.totalItems; i++) s += (l.scores[i] || 0);
+          totalScoreSum += s;
+        });
+        const meanScore = totalScoreSum / appState.learners.length;
+        const mps = (meanScore / p.totalItems) * 100;
+        document.getElementById('dash-mps').textContent = mps.toFixed(2) + '%';
+      } else {
+        document.getElementById('dash-mps').textContent = '0.00%';
+      }
+    }
+
+    function renderCompetencies() {
+      const tbody = document.getElementById('competency-table-body');
+      tbody.innerHTML = '';
+      appState.competencies.forEach((c, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b hover:bg-gray-50';
+        tr.innerHTML = `
+          <td class="p-3 font-semibold text-purple-900">${c.code}</td>
+          <td class="p-3">${c.text}</td>
+          <td class="p-3 font-medium text-gray-700">${c.topic}</td>
+          <td class="p-3 text-center">${c.hours} hrs</td>
+          <td class="p-3 text-center">
+            <button onclick="deleteCompetency(${idx})" class="text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteCompetency(index) {
+      appState.competencies.splice(index, 1);
+      renderAll();
+    }
+
+    function openCompetencyModal() {
+      const code = prompt('Enter Competency Code (e.g., M5NS-Ia-1):');
+      if (!code) return;
+      const text = prompt('Enter Learning Competency Description:');
+      const topic = prompt('Enter Topic / Content Area:');
+      const hours = parseInt(prompt('Enter Instructional Hours:', '4')) || 4;
+
+      appState.competencies.push({ id: 'C' + (appState.competencies.length + 1), code, text, topic, hours });
+      renderAll();
+    }
+
+    function renderTopicWeights() {
+      const tbody = document.getElementById('topic-weight-table');
+      tbody.innerHTML = '';
+      const totalHours = appState.competencies.reduce((sum, c) => sum + c.hours, 0);
+      const targetItems = appState.profile.totalItems;
+
+      let totalComputedItems = 0;
+      appState.competencies.forEach(c => {
+        const weight = totalHours > 0 ? (c.hours / totalHours) * 100 : 0;
+        const items = Math.round((weight / 100) * targetItems);
+        totalComputedItems += items;
+
+        const tr = document.createElement('tr');
+        tr.className = 'border-b';
+        tr.innerHTML = `
+          <td class="p-3 font-medium">${c.topic} (${c.code})</td>
+          <td class="p-3 text-center">${c.hours}</td>
+          <td class="p-3 text-center">${weight.toFixed(2)}%</td>
+          <td class="p-3 text-center font-bold text-deped-darkViolet">${items}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('weight-total-hours').textContent = totalHours;
+      document.getElementById('weight-total-percent').textContent = totalHours > 0 ? '100%' : '0%';
+      document.getElementById('weight-total-items').textContent = totalComputedItems;
+    }
+
+    function updateCognitiveWeights() {
+      const rem = parseInt(document.getElementById('cog-remember').value) || 0;
+      const und = parseInt(document.getElementById('cog-understand').value) || 0;
+      const app = parseInt(document.getElementById('cog-apply').value) || 0;
+      const ana = parseInt(document.getElementById('cog-analyze').value) || 0;
+      const eva = parseInt(document.getElementById('cog-evaluate').value) || 0;
+      const cre = parseInt(document.getElementById('cog-create').value) || 0;
+
+      const sum = rem + und + app + ana + eva + cre;
+      const statusBox = document.getElementById('cog-weight-status');
+
+      if (sum === 100) {
+        statusBox.className = 'p-3 rounded-lg text-xs font-bold text-emerald-700 bg-emerald-100';
+        statusBox.textContent = 'Total Cognitive Distribution Weight: 100% (Valid)';
+        appState.cogWeights = { rem, und, app, ana, eva, cre };
+        renderTOSMatrix();
+      } else {
+        statusBox.className = 'p-3 rounded-lg text-xs font-bold text-red-700 bg-red-100';
+        statusBox.textContent = `Total Weight is ${sum}%. Sum must equal exactly 100%.`;
+      }
+    }
+
+    function renderTOSMatrix() {
+      const tbody = document.getElementById('tos-matrix-body');
+      tbody.innerHTML = '';
+
+      const totalHours = appState.competencies.reduce((sum, c) => sum + c.hours, 0);
+      const targetItems = appState.profile.totalItems;
+      const cw = appState.cogWeights;
+
+      appState.competencies.forEach(c => {
+        const topicWeight = totalHours > 0 ? c.hours / totalHours : 0;
+        const topicItems = Math.round(topicWeight * targetItems);
+
+        const rItems = Math.round(topicItems * (cw.rem / 100));
+        const uItems = Math.round(topicItems * (cw.und / 100));
+        const aItems = Math.round(topicItems * (cw.app / 100));
+        const anItems = Math.round(topicItems * (cw.ana / 100));
+        const eItems = Math.round(topicItems * (cw.eva / 100));
+        const crItems = Math.max(0, topicItems - (rItems + uItems + aItems + anItems + eItems));
+
+        const tr = document.createElement('tr');
+        tr.className = 'border-b text-center';
+        tr.innerHTML = `
+          <td class="p-2 border text-left font-medium">${c.topic}</td>
+          <td class="p-2 border">${c.hours}</td>
+          <td class="p-2 border">${(topicWeight * 100).toFixed(1)}%</td>
+          <td class="p-2 border bg-purple-50">${rItems}</td>
+          <td class="p-2 border bg-purple-50">${uItems}</td>
+          <td class="p-2 border bg-purple-50">${aItems}</td>
+          <td class="p-2 border bg-purple-50">${anItems}</td>
+          <td class="p-2 border bg-purple-50">${eItems}</td>
+          <td class="p-2 border bg-purple-50">${crItems}</td>
+          <td class="p-2 border font-bold text-deped-darkViolet">${topicItems}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderItemBank() {
+      const list = document.getElementById('item-bank-list');
+      list.innerHTML = '';
+      appState.items.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'p-4 border border-purple-200 rounded-xl bg-purple-50 flex flex-col md:flex-row justify-between items-start md:items-center gap-3';
+        card.innerHTML = `
+          <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap gap-1 items-center">
+              <span class="inline-block bg-deped-mediumViolet text-white text-xs font-bold px-2 py-1 rounded">Item #${item.number}</span>
+              <span class="inline-block bg-purple-100 text-purple-900 text-[10px] font-semibold px-2 py-1 rounded">${escapeHtml(item.cogLevel || 'Remember')}</span>
+              <span class="inline-block bg-gray-200 text-gray-800 text-[10px] font-semibold px-2 py-1 rounded">${escapeHtml(item.topic || 'General')}</span>
+            </div>
+            <p class="text-sm font-semibold text-gray-800 mt-2">${escapeHtml(item.question || '')}</p>
+            <p class="text-xs text-gray-500 mt-1">Key Answer: <strong class="text-emerald-600">${escapeHtml(item.key || '')}</strong></p>
+          </div>
+          <div class="flex flex-wrap gap-1 no-print">
+            <button onclick="editItemNumber(${idx})" class="bg-white border border-purple-300 hover:bg-purple-100 text-deped-darkViolet px-2 py-1.5 rounded text-xs font-semibold"><i class="fa-solid fa-hashtag mr-1"></i>Edit Number</button>
+            <button onclick="editItem(${idx})" class="bg-white border border-blue-300 hover:bg-blue-50 text-blue-700 px-2 py-1.5 rounded text-xs font-semibold"><i class="fa-solid fa-pen mr-1"></i>Edit Item</button>
+            <button onclick="addItemAfter(${idx})" class="bg-white border border-emerald-300 hover:bg-emerald-50 text-emerald-700 px-2 py-1.5 rounded text-xs font-semibold"><i class="fa-solid fa-plus mr-1"></i>Add After</button>
+            <button onclick="deleteItem(${idx})" class="bg-white border border-red-300 hover:bg-red-50 text-red-700 px-2 py-1.5 rounded text-xs font-semibold"><i class="fa-solid fa-trash mr-1"></i>Delete</button>
+          </div>`;
+        list.appendChild(card);
+      });
+      if (!appState.items.length) list.innerHTML = '<p class="text-sm text-gray-500 p-4 border rounded-lg">No items yet. Select “Add Item” to begin.</p>';
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+    }
+
+    function renumberItemsAndScores(oldNumberByItem) {
+      appState.items.forEach((item, idx) => {
+        const oldNumber = oldNumberByItem.get(item);
+        item.number = idx + 1;
+        item.id = idx + 1;
+        appState.learners.forEach(learner => {
+          if (oldNumber !== undefined && learner.scores[oldNumber] !== undefined) {
+            learner._newScores = learner._newScores || {};
+            learner._newScores[idx + 1] = learner.scores[oldNumber];
+          }
+        });
+      });
+      appState.learners.forEach(learner => {
+        if (learner._newScores) {
+          learner.scores = learner._newScores;
+          delete learner._newScores;
+        }
+      });
+      // Ensure every learner has a score cell for every item.
+      appState.learners.forEach(learner => appState.items.forEach(item => {
+        if (learner.scores[item.number] === undefined) learner.scores[item.number] = 0;
+      }));
+    }
+
+    function addItemAtPosition(position) {
+      const raw = position ?? document.getElementById('insert-item-position').value;
+      const pos = Math.max(1, Math.min(appState.items.length + 1, parseInt(raw, 10) || 1));
+      const q = prompt(`Enter question for new item at position ${pos}:`);
+      if (!q || !q.trim()) return;
+      const oldNumberByItem = new Map(appState.items.map(item => [item, item.number]));
+      const item = { id: Date.now(), number: pos, question: q.trim(), topic: appState.competencies[0]?.topic || 'General', cogLevel: 'Remember', key: 'A' };
+      appState.items.splice(pos - 1, 0, item);
+      renumberItemsAndScores(oldNumberByItem);
+      renderAll();
+    }
+
+    function addItemAfter(index) { addItemAtPosition(index + 2); }
+    function openItemModal() { addItemAtPosition(appState.items.length + 1); }
+
+    function editItem(index) {
+      const item = appState.items[index];
+      if (!item) return;
+      const question = prompt('Edit question text:', item.question || '');
+      if (question === null) return;
+      const topic = prompt('Edit topic/content area:', item.topic || 'General');
+      if (topic === null) return;
+      const cogLevel = prompt('Cognitive level (Remember, Understand, Apply, Analyze, Evaluate, Create):', item.cogLevel || 'Remember');
+      if (cogLevel === null) return;
+      const key = prompt('Correct answer/key:', item.key || 'A');
+      if (key === null) return;
+      Object.assign(item, { question: question.trim(), topic: topic.trim() || 'General', cogLevel: cogLevel.trim() || 'Remember', key: key.trim() || 'A' });
+      renderAll();
+    }
+
+    function editItemNumber(index) {
+      const item = appState.items[index];
+      if (!item) return;
+      const requested = parseInt(prompt(`Enter new item number (1-${appState.items.length}):`, item.number), 10);
+      if (!Number.isInteger(requested) || requested < 1 || requested > appState.items.length || requested === item.number) return;
+      const oldNumberByItem = new Map(appState.items.map(it => [it, it.number]));
+      appState.items.splice(index, 1);
+      appState.items.splice(requested - 1, 0, item);
+      renumberItemsAndScores(oldNumberByItem);
+      renderAll();
+    }
+
+    function deleteItem(index) {
+      const item = appState.items[index];
+      if (!item || !confirm(`Delete Item #${item.number}? Remaining items and learner responses will be renumbered.`)) return;
+      const oldNumberByItem = new Map(appState.items.map(it => [it, it.number]));
+      appState.items.splice(index, 1);
+      renumberItemsAndScores(oldNumberByItem);
+      renderAll();
+    }
+
+    function deleteLearnerRow(index) {
+      if (!appState.learners[index]) return;
+      if (!confirm(`Delete ${appState.learners[index].name || 'this learner'} and their responses?`)) return;
+      appState.learners.splice(index, 1);
+      renderAll();
+    }
+
+    function printSignatoriesHtml() {
+      return `<section class="print-signatories" aria-label="Assessment approval signatures">
+        <div class="print-signatories-grid">
+          <div class="print-signatory">
+            <div class="print-signatory-label">Prepared by:</div>
+            <div class="print-signature-line"></div>
+            <div class="print-signatory-name">(Teacher Name)</div>
+            <div class="print-signatory-role">Teacher</div>
+          </div>
+          <div class="print-signatory">
+            <div class="print-signatory-label">Checked by:</div>
+            <div class="print-signature-line"></div>
+            <div class="print-signatory-name">(Master Teacher Name)</div>
+            <div class="print-signatory-role">Master Teacher</div>
+          </div>
+          <div class="print-signatory">
+            <div class="print-signatory-label">Approved by:</div>
+            <div class="print-signature-line"></div>
+            <div class="print-signatory-name">(School Head Name)</div>
+            <div class="print-signatory-role">School Head</div>
+          </div>
+        </div>
+        <div class="print-developer">Developed by: <strong>PRISCO C. DULPINA, School Head</strong></div>
+      </section>`;
+    }
+
+    function itemBankTableHtml() {
+      const rows = appState.items.map(item => `<tr><td>${item.number}</td><td>${escapeHtml(item.question)}</td><td>${escapeHtml(item.topic || '')}</td><td>${escapeHtml(item.cogLevel || '')}</td><td>${escapeHtml(item.key || '')}</td></tr>`).join('');
+      return `<h1>${escapeHtml(appState.profile.title || 'Item Bank')}</h1><p>${escapeHtml(appState.profile.school || '')} | ${escapeHtml(appState.profile.subject || '')} | ${escapeHtml(appState.profile.grade || '')} | ${escapeHtml(appState.profile.term || 'Term 1')}</p><table border="1" cellspacing="0" cellpadding="6" style="border-collapse:collapse;width:100%"><thead><tr><th>Item No.</th><th>Question</th><th>Topic</th><th>Cognitive Level</th><th>Answer Key</th></tr></thead><tbody>${rows}</tbody></table>${printSignatoriesHtml()}`;
+    }
+
+    function printFullItemBank() {
+      const win = window.open('', '_blank');
+      if (!win) { alert('Please allow pop-ups to print the item bank.'); return; }
+      win.document.write(`<html><head><title>Print Item Bank</title><style>body{font-family:Arial,sans-serif;padding:24px;color:#111}table{border-collapse:collapse;width:100%}td,th{border:1px solid #555;padding:8px;text-align:left}th{background:#eee}h1{color:#59257c}.print-signatories{display:block!important;margin-top:34px;break-inside:avoid;page-break-inside:avoid}.print-signatories-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;break-inside:avoid;page-break-inside:avoid}.print-signatory{text-align:center}.print-signature-line{border-bottom:1px solid #111;height:28px;margin:0 6px 6px}.print-developer{text-align:center;margin-top:24px}</style></head><body>${itemBankTableHtml()}<script>window.onload=()=>window.print();<\/script></body></html>`);
+      win.document.close();
+    }
+
+    async function exportItemBankPDF() {
+      if (typeof html2pdf === 'undefined') {
+        alert('PDF export is unavailable. Check your internet connection and try again.');
+        return;
+      }
+      const wrapper = document.createElement('div');
+      wrapper.className = 'pdf-exporting';
+      wrapper.style.cssText = 'background:#fff;color:#111;padding:18px;font-family:Arial,Helvetica,sans-serif;width:100%;box-sizing:border-box;';
+      const p = appState.profile || {};
+      const questions = appState.items.map(item => `<div class="assessment-question"><div><strong>${item.number}.</strong> ${escapeHtml(item.question || '')}</div><div class="assessment-answer-space"></div></div>`).join('');
+      wrapper.innerHTML = `<header class="assessment-header"><h1>${escapeHtml(p.school || '')}</h1><h2>${escapeHtml(p.title || 'Assessment')}</h2><p>${escapeHtml(p.subject || '')} | ${escapeHtml(p.grade || '')} | ${escapeHtml(p.section || '')} | ${escapeHtml(p.term || 'Term 1')} | S.Y. ${escapeHtml(p.sy || '')}</p><p>Name: ____________________________________________ &nbsp; Score: __________</p></header><main class="assessment-questions">${questions || '<p>No assessment questions have been added yet.</p>'}</main>${printSignatoriesHtml()}`;
+      const style = document.createElement('style');
+      style.textContent = '.pdf-exporting h1{font-size:15pt;text-align:center;margin:0 0 5px}.pdf-exporting h2{font-size:14pt;text-align:center;margin:0 0 7px}.assessment-header{text-align:center;margin-bottom:18px}.assessment-header p{font-size:10pt;margin:5px 0}.assessment-question{font-size:11pt;margin:0 0 16px;break-inside:avoid;page-break-inside:avoid}.assessment-answer-space{height:25px;border-bottom:1px solid #bbb;margin:6px 0 0 20px}.print-signatories{display:block!important;margin-top:34px;break-inside:avoid;page-break-inside:avoid}.print-signatories-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;break-inside:avoid;page-break-inside:avoid}.print-signatory{text-align:center;font-size:10pt}.print-signature-line{border-bottom:1px solid #111;height:28px;margin:0 6px 6px}.print-developer{text-align:center;margin-top:24px;font-size:9pt}';
+      wrapper.prepend(style);
+      document.body.appendChild(wrapper);
+      try {
+        await html2pdf().set({
+          margin: [10, 10, 12, 10],
+          filename: `${(appState.profile.title || 'Assessment').replace(/[^a-z0-9_-]+/gi, '_')}.pdf`,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: { scale: 2, useCORS: true },
+          jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+          pagebreak: { mode: ['css', 'legacy'], avoid: ['.print-signatories', '.print-signatories-grid'] }
+        }).from(wrapper).save();
+      } finally {
+        wrapper.remove();
+      }
+    }
+
+    function exportItemBankExcel() {
+      if (typeof XLSX === 'undefined') { alert('Excel export library is unavailable. Check your internet connection and try again.'); return; }
+      const data = [['Item No.','Question','Topic','Cognitive Level','Answer Key'], ...appState.items.map(i => [i.number, i.question, i.topic, i.cogLevel, i.key])];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(data), 'Item Bank');
+      XLSX.writeFile(wb, 'Item_Bank.xlsx');
+    }
+
+    function exportItemBankWord() {
+      const html = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Item Bank</title><style>table{border-collapse:collapse;width:100%}td,th{border:1px solid #555;padding:6px;text-align:left}th{background:#eee}</style></head><body>${itemBankTableHtml()}</body></html>`;
+      const blob = new Blob(['\ufeff', html], {type:'application/msword'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'Item_Bank.doc'; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function saveDataLocally() {
+      try {
+        localStorage.setItem('tosItemAnalysisProData', JSON.stringify(appState));
+      } catch (e) { /* browser storage may be unavailable for local files */ }
+      const blob = new Blob([JSON.stringify(appState, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'TOS_Item_Analysis_Data.json'; a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      alert('Assessment data saved as a local JSON backup. You can load this file later.');
+    }
+
+    function loadDataLocally(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const loaded = JSON.parse(reader.result);
+          if (!loaded || typeof loaded !== 'object' || !loaded.profile || !Array.isArray(loaded.items) || !Array.isArray(loaded.learners)) throw new Error('Invalid file');
+          appState = loaded;
+          appState.competencies = Array.isArray(appState.competencies) ? appState.competencies : [];
+          appState.cogWeights = appState.cogWeights || {rem:20,und:20,app:15,ana:15,eva:15,cre:15};
+          appState.items.forEach((item, idx) => { item.number = idx + 1; item.id = idx + 1; });
+          renderAll();
+          try { localStorage.setItem('tosItemAnalysisProData', JSON.stringify(appState)); } catch (e) {}
+          alert('Assessment data loaded successfully.');
+        } catch (e) { alert('Could not load this file. Please choose a valid TOS Item Analysis JSON backup.'); }
+        event.target.value = '';
+      };
+      reader.readAsText(file);
+    }
+
+    function renderResponses() {
+      const headerRow = document.getElementById('response-header-row');
+      const tbody = document.getElementById('response-table-body');
+
+      headerRow.innerHTML = '<th class="p-2 min-w-[150px] border">Learner Name</th>';
+      for (let i = 1; i <= appState.profile.totalItems; i++) {
+        const th = document.createElement('th');
+        th.className = 'p-1 border text-center min-w-[32px]';
+        th.textContent = `Q${i}`;
+        headerRow.appendChild(th);
+      }
+
+      tbody.innerHTML = '';
+      appState.learners.forEach((l, lIdx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b hover:bg-gray-50';
+        let cells = `<td class="p-2 border font-medium">${l.name}</td>`;
+        for (let i = 1; i <= appState.profile.totalItems; i++) {
+          const score = l.scores[i] !== undefined ? l.scores[i] : 0;
+          cells += `
+            <td class="p-1 border text-center">
+              <input type="number" min="0" max="1" value="${score}" 
+                     onchange="updateScore(${lIdx}, ${i}, this.value)" 
+                     class="w-8 text-center border rounded py-0.5 text-xs focus:ring-1 focus:ring-purple-400"/>
+            </td>
+          `;
+        }
+        cells += `<td class="p-2 border text-center no-print"><button onclick="deleteLearnerRow(${lIdx})" class="bg-red-100 hover:bg-red-200 text-red-700 px-2 py-1 rounded" title="Delete learner row"><i class="fa-solid fa-trash"></i> Delete</button></td>`;
+        tr.innerHTML = cells;
+        tbody.appendChild(tr);
+      });
+      const actionHead = document.createElement('th');
+      actionHead.className = 'p-2 border text-center no-print';
+      actionHead.textContent = 'Action';
+      headerRow.appendChild(actionHead);
+    }
+
+    function updateScore(learnerIndex, itemNum, value) {
+      appState.learners[learnerIndex].scores[itemNum] = parseInt(value) || 0;
+      renderDashboard();
+      renderItemAnalysis();
+      renderGapAnalysis();
+    }
+
+    function addLearnerRow() {
+      const lNum = appState.learners.length + 1;
+      const scores = {};
+      for (let i = 1; i <= appState.profile.totalItems; i++) scores[i] = 1;
+      appState.learners.push({ id: lNum, name: `Learner ${lNum}`, scores });
+      renderAll();
+    }
+
+    function renderItemAnalysis() {
+      const tbody = document.getElementById('item-analysis-table-body');
+      tbody.innerHTML = '';
+
+      const totalLearners = appState.learners.length;
+      if (totalLearners === 0) return;
+
+      // Compute total scores for each learner to separate upper/lower 27%
+      const learnerTotals = appState.learners.map(l => {
+        let sum = 0;
+        for (let i = 1; i <= appState.profile.totalItems; i++) sum += (l.scores[i] || 0);
+        return { learner: l, total: sum };
+      });
+
+      learnerTotals.sort((a, b) => b.total - a.total);
+
+      const groupSize = Math.max(1, Math.round(totalLearners * 0.27));
+      const upperGroup = learnerTotals.slice(0, groupSize);
+      const lowerGroup = learnerTotals.slice(-groupSize);
+
+      for (let i = 1; i <= appState.profile.totalItems; i++) {
+        let correctCount = 0;
+        learnerTotals.forEach(lt => { correctCount += (lt.learner.scores[i] || 0); });
+
+        const p = correctCount / totalLearners; // Difficulty Index
+
+        let upperCorrect = 0;
+        upperGroup.forEach(lt => { upperCorrect += (lt.learner.scores[i] || 0); });
+
+        let lowerCorrect = 0;
+        lowerGroup.forEach(lt => { lowerCorrect += (lt.learner.scores[i] || 0); });
+
+        const D = (upperCorrect - lowerCorrect) / groupSize; // Discrimination Index
+
+        // Ratings
+        let pRating = 'Moderate';
+        if (p > 0.85) pRating = 'Very Easy';
+        else if (p > 0.70) pRating = 'Easy';
+        else if (p < 0.20) pRating = 'Very Difficult';
+        else if (p < 0.35) pRating = 'Difficult';
+
+        let dRating = 'Good';
+        if (D >= 0.40) dRating = 'Excellent';
+        else if (D >= 0.30) dRating = 'Good';
+        else if (D >= 0.20) dRating = 'Acceptable';
+        else if (D >= 0.00) dRating = 'Poor';
+        else dRating = 'Negative';
+
+        let action = '<span class="text-emerald-600 font-bold">KEEP</span>';
+        if (D < 0 || p < 0.20) action = '<span class="text-red-600 font-bold">REVISE / DISCARD</span>';
+        else if (D < 0.20 || p > 0.85) action = '<span class="text-amber-600 font-bold">REVIEW</span>';
+
+        const tr = document.createElement('tr');
+        tr.className = 'border-b hover:bg-gray-50';
+        tr.innerHTML = `
+          <td class="p-2 border font-bold">Q${i}</td>
+          <td class="p-2 border text-center">${correctCount} / ${totalLearners}</td>
+          <td class="p-2 border text-center font-semibold">${p.toFixed(2)}</td>
+          <td class="p-2 border">${pRating}</td>
+          <td class="p-2 border text-center font-semibold">${D.toFixed(2)}</td>
+          <td class="p-2 border">${dRating}</td>
+          <td class="p-2 border text-center text-xs">${action}</td>
+        `;
+        tbody.appendChild(tr);
+      }
+    }
+
+    function renderGapAnalysis() {
+      const container = document.getElementById('gap-remediation-container');
+      container.innerHTML = '';
+
+      if (appState.competencies.length === 0 || appState.learners.length === 0) {
+        container.innerHTML = '<p class="text-xs text-gray-500">Add competencies and scores to display learning gaps.</p>';
+        return;
+      }
+
+      appState.competencies.forEach((c, cIdx) => {
+        // Compute average score for items in this topic
+        const topicItems = appState.items.filter(it => it.topic === c.topic);
+        let topicTotalScores = 0;
+        let possibleScores = topicItems.length * appState.learners.length;
+
+        if (possibleScores > 0) {
+          appState.learners.forEach(l => {
+            topicItems.forEach(it => {
+              topicTotalScores += (l.scores[it.number] || 0);
+            });
+          });
+        }
+
+        const mastery = possibleScores > 0 ? (topicTotalScores / possibleScores) * 100 : 75;
+
+        const card = document.createElement('div');
+        card.className = `p-4 border rounded-xl ${mastery < 60 ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}`;
+        card.innerHTML = `
+          <div class="flex justify-between items-start mb-2">
+            <div>
+              <span class="text-xs font-bold text-gray-600">${c.code} — ${c.topic}</span>
+              <h4 class="text-sm font-bold text-gray-800">${c.text}</h4>
+            </div>
+            <span class="text-sm font-extrabold ${mastery < 60 ? 'text-red-600' : 'text-emerald-700'}">${mastery.toFixed(1)}% Class Accuracy</span>
+          </div>
+          <p class="text-xs text-gray-600 mt-1">
+            <strong>Instructional Recommendation:</strong> ${
+              mastery < 60 
+                ? 'Priority Learning Gap Detected. Conduct targeted reteaching, peer mentoring, and supplementary activity sheets.' 
+                : 'Competency Mastered. Proceed with enrichment tasks and advanced application exercises.'
+            }
+          </p>
+        `;
+        container.appendChild(card);
+      });
+    }
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Academic Report Generator</title>
+
+    <!-- UI & Export Libraries via CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- SheetJS (Excel) -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- html2pdf.js (PDF Export) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        body { background-color: #f8f9fa; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .report-card { background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); padding: 25px; margin-bottom: 30px; }
+        .report-header { text-align: center; margin-bottom: 25px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+        .report-table th { background-color: #f1f3f5; text-align: center; vertical-align: middle; }
+        
+        /* Specialized Print CSS */
+        @media print {
+            body * { visibility: hidden; }
+            .no-print { display: none !important; }
+            #export-area, #export-area * { visibility: visible; }
+            #export-area { position: absolute; left: 0; top: 0; width: 100%; padding: 0; }
+            .report-card { box-shadow: none !important; border: none !important; padding: 0 !important; }
+            .table-bordered th, .table-bordered td { border: 1px solid #000 !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container my-4">
+    <!-- Toolbar Controls -->
+    <div class="card p-3 mb-4 no-print shadow-sm">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <label for="templateSelect" class="form-label fw-bold">Select Report Template:</label>
+                <select id="templateSelect" class="form-select" onchange="switchTemplate()">
+                    <option value="tos">Table of Specifications (TOS)</option>
+                    <option value="item-analysis">Item Analysis Report</option>
+                    <option value="grade-summary">Grade Summary Report</option>
+                </select>
+            </div>
+            <div class="col-md-7 text-end">
+                <label class="form-label d-block fw-bold">Export Options:</label>
+                <button class="btn btn-outline-dark me-1" onclick="printReport()"><i class="fas fa-print me-1"></i> Print</button>
+                <button class="btn btn-danger me-1" onclick="exportPDF()"><i class="fas fa-file-pdf me-1"></i> PDF</button>
+                <button class="btn btn-success me-1" onclick="exportExcel()"><i class="fas fa-file-excel me-1"></i> Excel</button>
+                <button class="btn btn-primary" onclick="exportWord()"><i class="fas fa-file-word me-1"></i> Word</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Active Report Render Zone -->
+    <div id="export-area">
+        
+        <!-- TEMPLATE 1: Table of Specifications (TOS) -->
+        <div id="tos-template" class="report-card template-view">
+            <div class="report-header">
+                <h4 class="m-0 text-uppercase fw-bold">Table of Specifications (TOS)</h4>
+                <p class="m-0 text-muted">Subject: Mathematics 10 | First Quarter Examination</p>
+            </div>
+            <table class="table table-bordered align-middle report-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">Learning Competencies</th>
+                        <th rowspan="2">Hours</th>
+                        <th rowspan="2">%</th>
+                        <th colspan="3">Cognitive Process Dimensions</th>
+                        <th rowspan="2">Total Items</th>
+                    </tr>
+                    <tr>
+                        <th>Remembering</th>
+                        <th>Understanding</th>
+                        <th>Applying / Higher</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>1. Solves problems involving sequences</td>
+                        <td class="text-center">10</td>
+                        <td class="text-center">25%</td>
+                        <td class="text-center">1, 2, 3</td>
+                        <td class="text-center">4, 5</td>
+                        <td class="text-center">6, 7</td>
+                        <td class="text-center fw-bold">7</td>
+                    </tr>
+                    <tr>
+                        <td>2. Performs division of polynomials</td>
+                        <td class="text-center">15</td>
+                        <td class="text-center">37.5%</td>
+                        <td class="text-center">8, 9, 10</td>
+                        <td class="text-center">11, 12, 13</td>
+                        <td class="text-center">14, 15</td>
+                        <td class="text-center fw-bold">8</td>
+                    </tr>
+                    <tr>
+                        <td>3. Proves statements on polynomial equations</td>
+                        <td class="text-center">15</td>
+                        <td class="text-center">37.5%</td>
+                        <td class="text-center">16, 17</td>
+                        <td class="text-center">18, 19, 20</td>
+                        <td class="text-center">21, 22, 23, 24, 25</td>
+                        <td class="text-center fw-bold">10</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr class="fw-bold bg-light">
+                        <td class="text-end">Total:</td>
+                        <td class="text-center">40</td>
+                        <td class="text-center">100%</td>
+                        <td class="text-center">8</td>
+                        <td class="text-center">8</td>
+                        <td class="text-center">9</td>
+                        <td class="text-center">25</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- TEMPLATE 2: Item Analysis -->
+        <div id="item-analysis-template" class="report-card template-view d-none">
+            <div class="report-header">
+                <h4 class="m-0 text-uppercase fw-bold">Item Analysis Report</h4>
+                <p class="m-0 text-muted">Subject: Science 9 | Total Test Takers: 50</p>
+            </div>
+            <table class="table table-bordered align-middle report-table">
+                <thead>
+                    <tr>
+                        <th>Item No.</th>
+                        <th>Correct Responses</th>
+                        <th>Difficulty Index</th>
+                        <th>Discrimination Index</th>
+                        <th>Decision / Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="text-center">1</td>
+                        <td class="text-center">45</td>
+                        <td class="text-center">0.90 (Very Easy)</td>
+                        <td class="text-center">0.15 (Poor)</td>
+                        <td class="text-center"><span class="badge bg-warning text-dark">Revise</span></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">2</td>
+                        <td class="text-center">32</td>
+                        <td class="text-center">0.64 (Moderate)</td>
+                        <td class="text-center">0.42 (Very Good)</td>
+                        <td class="text-center"><span class="badge bg-success">Retain</span></td>
+                    </tr>
+                    <tr>
+                        <td class="text-center">3</td>
+                        <td class="text-center">10</td>
+                        <td class="text-center">0.20 (Difficult)</td>
+                        <td class="text-center">0.08 (Poor)</td>
+                        <td class="text-center"><span class="badge bg-danger">Discard</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- TEMPLATE 3: Grade Summary -->
+        <div id="grade-summary-template" class="report-card template-view d-none">
+            <div class="report-header">
+                <h4 class="m-0 text-uppercase fw-bold">Class Grade Summary</h4>
+                <p class="m-0 text-muted">Section: Grade 10 - Einstein</p>
+            </div>
+            <table class="table table-bordered align-middle report-table">
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Written Work (30%)</th>
+                        <th>Performance Task (50%)</th>
+                        <th>Assessment (20%)</th>
+                        <th>Final Grade</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Doe, Jane</td>
+                        <td class="text-center">92</td>
+                        <td class="text-center">95</td>
+                        <td class="text-center">88</td>
+                        <td class="text-center fw-bold">92.7 (Passed)</td>
+                    </tr>
+                    <tr>
+                        <td>Smith, John</td>
+                        <td class="text-center">80</td>
+                        <td class="text-center">85</td>
+                        <td class="text-center">78</td>
+                        <td class="text-center fw-bold">82.1 (Passed)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Handle Template Switching
+    function switchTemplate() {
+        const selected = document.getElementById('templateSelect').value;
+        document.querySelectorAll('.template-view').forEach(el => el.classList.add('d-none'));
+        document.getElementById(`${selected}-template`).classList.remove('d-none');
+    }
+
+    // 1. Native Print Command
+    function printReport() {
+        window.print();
+    }
+
+    // 2. Export to PDF (Client-side HTML Rendering)
+    function exportPDF() {
+        const selectedTemplate = document.getElementById('templateSelect').value;
+        const element = document.querySelector(`#${selectedTemplate}-template`);
+        
+        const options = {
+            margin:       [10, 10, 10, 10],
+            filename:     `${selectedTemplate}_report.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2 },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+
+        html2pdf().set(options).from(element).save();
+    }
+
+    // 3. Export to Excel (Generates actual .xlsx file via SheetJS)
+    function exportExcel() {
+        const selectedTemplate = document.getElementById('templateSelect').value;
+        const table = document.querySelector(`#${selectedTemplate}-template table`);
+        
+        const wb = XLSX.utils.table_to_book(table, { sheet: "Report Data" });
+        XLSX.writeFile(wb, `${selectedTemplate}_report.xlsx`);
+    }
+
+    // 4. Export to Word (Native XML Blob Format readable by MS Word)
+    function exportWord() {
+        const selectedTemplate = document.getElementById('templateSelect').value;
+        const htmlContent = document.querySelector(`#${selectedTemplate}-template`).innerHTML;
+        
+        const preHtml = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Exported Report</title><style>table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #000; padding: 8px; text-align: center; }</style></head><body>";
+        const postHtml = "</body></html>";
+        const fullHtml = preHtml + htmlContent + postHtml;
+
+        const blob = new Blob(['\ufeff', fullHtml], {
+            type: 'application/msword'
+        });
+
+        const downloadLink = document.createElement("a");
+        document.body.appendChild(downloadLink);
+        
+        if (navigator.msSaveOrOpenBlob) {
+            navigator.msSaveOrOpenBlob(blob, `${selectedTemplate}_report.doc`);
+        } else {
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = `${selectedTemplate}_report.doc`;
+            downloadLink.click();
+        }
+        
+        document.body.removeChild(downloadLink);
+    }
+</script>
+
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Academic Report & Assessment Suite</title>
+
+    <!-- UI & Export Libraries -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <style>
+        body { background-color: #f4f6f9; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        .report-card { background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 25px; margin-bottom: 30px; }
+        .editable-cell { background-color: #fffde7; border: 1px dashed #ffc107 !important; outline: none; transition: background 0.2s; }
+        .editable-cell:focus { background-color: #ffffff; border: 1px solid #0d6efd !important; box-shadow: 0 0 4px rgba(13,110,253,0.5); }
+        .table th { background-color: #f1f3f5; vertical-align: middle; text-align: center; }
+        
+        /* Print Optimizations */
+        @media print {
+            body * { visibility: hidden; }
+            .no-print { display: none !important; }
+            #export-area, #export-area * { visibility: visible; }
+            #export-area { position: absolute; left: 0; top: 0; width: 100%; }
+            .editable-cell { border: none !important; background: transparent !important; }
+            .btn-table-action { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container-fluid px-4 my-4">
+    <!-- Action Bar -->
+    <div class="card p-3 mb-4 no-print shadow-sm">
+        <div class="row g-3 align-items-center">
+            <div class="col-md-4">
+                <label for="templateSelect" class="form-label fw-bold">Select Active Workspace / Report Template:</label>
+                <select id="templateSelect" class="form-select" onchange="switchTemplate()">
+                    <option value="tos">1. Editable Table of Specifications (TOS)</option>
+                    <option value="item-analysis">2. Editable Item Analysis & Remediation Matrix</option>
+                    <option value="item-bank">3. Editable Item Bank & Student Responses</option>
+                </select>
+            </div>
+            <div class="col-md-8 text-end">
+                <label class="form-label d-block fw-bold">Export & Print Actions:</label>
+                <button class="btn btn-outline-dark me-1" onclick="printReport()"><i class="fas fa-print me-1"></i> Print</button>
+                <button class="btn btn-danger me-1" onclick="exportPDF()"><i class="fas fa-file-pdf me-1"></i> Download PDF</button>
+                <button class="btn btn-success me-1" onclick="exportExcel()"><i class="fas fa-file-excel me-1"></i> Download Excel</button>
+                <button class="btn btn-primary" onclick="exportWord()"><i class="fas fa-file-word me-1"></i> Download Word</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Container -->
+    <div id="export-area">
+        
+        <!-- 1. TABLE OF SPECIFICATIONS (TOS) -->
+        <div id="tos-template" class="report-card template-view">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="fw-bold m-0" contenteditable="true">TABLE OF SPECIFICATIONS (TOS)</h3>
+                    <p class="text-muted m-0" contenteditable="true">Subject: Science 10 | Target Exam Items: <span id="target-items">50</span></p>
+                </div>
+                <button class="btn btn-sm btn-outline-primary no-print" onclick="addRow('tos-table')"><i class="fas fa-plus me-1"></i> Add Competency Row</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle" id="tos-table">
+                    <thead>
+                        <tr>
+                            <th rowspan="2">Learning Competencies</th>
+                            <th rowspan="2" style="width: 100px;">Time Spent (Hours)</th>
+                            <th rowspan="2" style="width: 90px;">Weight (%)</th>
+                            <th colspan="3">Cognitive Process Dimensions (Item Allocation)</th>
+                            <th rowspan="2" style="width: 100px;">Total Items</th>
+                            <th rowspan="2" class="no-print" style="width: 50px;">Action</th>
+                        </tr>
+                        <tr>
+                            <th>Remembering / Understanding</th>
+                            <th>Applying / Analyzing</th>
+                            <th>Evaluating / Creating</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td contenteditable="true" class="editable-cell">1. Differentiate types of plate boundaries</td>
+                            <td contenteditable="true" class="editable-cell text-center hours-val" oninput="calculateTOS()">12</td>
+                            <td class="text-center weight-val fw-bold">0%</td>
+                            <td contenteditable="true" class="editable-cell text-center item-alloc" oninput="calculateTOS()">1, 2, 3, 4, 5</td>
+                            <td contenteditable="true" class="editable-cell text-center item-alloc" oninput="calculateTOS()">6, 7, 8</td>
+                            <td contenteditable="true" class="editable-cell text-center item-alloc" oninput="calculateTOS()">9, 10</td>
+                            <td class="text-center fw-bold row-item-count">10</td>
+                            <td class="text-center no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteRow(this, 'tos-table')"><i class="fas fa-trash"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" class="editable-cell">2. Explain the processes that occur along plate boundaries</td>
+                            <td contenteditable="true" class="editable-cell text-center hours-val" oninput="calculateTOS()">18</td>
+                            <td class="text-center weight-val fw-bold">0%</td>
+                            <td contenteditable="true" class="editable-cell text-center item-alloc" oninput="calculateTOS()">11, 12, 13, 14</td>
+                            <td contenteditable="true" class="editable-cell text-center item-alloc" oninput="calculateTOS()">15, 16, 17, 18, 19, 20</td>
+                            <td contenteditable="true" class="editable-cell text-center item-alloc" oninput="calculateTOS()">21, 22, 23, 24, 25</td>
+                            <td class="text-center fw-bold row-item-count">15</td>
+                            <td class="text-center no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteRow(this, 'tos-table')"><i class="fas fa-trash"></i></button></td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr class="fw-bold bg-light">
+                            <td class="text-end">Total Calculations:</td>
+                            <td class="text-center" id="total-hours">0</td>
+                            <td class="text-center" id="total-weight">0%</td>
+                            <td colspan="3" class="text-end">Calculated Exam Items:</td>
+                            <td class="text-center" id="total-items">0</td>
+                            <td class="no-print"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="alert alert-info no-print mt-2" role="alert">
+                <i class="fas fa-info-circle me-1"></i> Edit <strong>Time (Hours)</strong> and <strong>Item Ranges</strong> directly in the cells. Weights and Item counts will auto-calculate, but manual overrides can be typed directly anywhere.
+            </div>
+        </div>
+
+        <!-- 2. ITEM ANALYSIS, GAP ANALYSIS & REMEDIATION -->
+        <div id="item-analysis-template" class="report-card template-view d-none">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="fw-bold m-0" contenteditable="true">ITEM ANALYSIS, GAP ANALYSIS & REMEDIATION MATRIX</h3>
+                    <p class="text-muted m-0" contenteditable="true">Total Student Test Takers: <span contenteditable="true" id="total-takers" oninput="calculateItemAnalysis()">40</span></p>
+                </div>
+                <button class="btn btn-sm btn-outline-primary no-print" onclick="addRow('analysis-table')"><i class="fas fa-plus me-1"></i> Add Analysis Item</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle" id="analysis-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">Item #</th>
+                            <th>Target Competency / Skill</th>
+                            <th style="width: 100px;">Correct Responses</th>
+                            <th style="width: 110px;">Difficulty Index</th>
+                            <th style="width: 140px;">Discrimination Index</th>
+                            <th style="width: 150px;">Gap Analysis (Identified Weakness)</th>
+                            <th style="width: 180px;">Action / Remediation Plan</th>
+                            <th style="width: 130px;">Decision Override</th>
+                            <th class="no-print" style="width: 50px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td contenteditable="true" class="editable-cell text-center">1</td>
+                            <td contenteditable="true" class="editable-cell">Identify plate boundary types</td>
+                            <td contenteditable="true" class="editable-cell text-center correct-val" oninput="calculateItemAnalysis()">36</td>
+                            <td class="text-center diff-index fw-bold">0.90</td>
+                            <td contenteditable="true" class="editable-cell text-center disc-index">0.45</td>
+                            <td contenteditable="true" class="editable-cell">None. High mastery demonstrated.</td>
+                            <td contenteditable="true" class="editable-cell">Proceed to enrichment activities.</td>
+                            <td>
+                                <select class="form-select form-select-sm text-center fw-bold">
+                                    <option value="retain" class="text-success" selected>Retain Item</option>
+                                    <option value="revise" class="text-warning">Revise Item</option>
+                                    <option value="discard" class="text-danger">Discard Item</option>
+                                </select>
+                            </td>
+                            <td class="text-center no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteRow(this, 'analysis-table')"><i class="fas fa-trash"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" class="editable-cell text-center">2</td>
+                            <td contenteditable="true" class="editable-cell">Calculate oceanic trench depth using seismic data</td>
+                            <td contenteditable="true" class="editable-cell text-center correct-val" oninput="calculateItemAnalysis()">12</td>
+                            <td class="text-center diff-index fw-bold">0.30</td>
+                            <td contenteditable="true" class="editable-cell text-center disc-index">0.12</td>
+                            <td contenteditable="true" class="editable-cell">Students struggled with multi-step mathematical calculations.</td>
+                            <td contenteditable="true" class="editable-cell">Conduct targeted peer tutoring and re-teach formula applications.</td>
+                            <td>
+                                <select class="form-select form-select-sm text-center fw-bold">
+                                    <option value="retain" class="text-success">Retain Item</option>
+                                    <option value="revise" class="text-warning" selected>Revise Item</option>
+                                    <option value="discard" class="text-danger">Discard Item</option>
+                                </select>
+                            </td>
+                            <td class="text-center no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteRow(this, 'analysis-table')"><i class="fas fa-trash"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 3. ITEM BANK & STUDENT RESPONSES -->
+        <div id="item-bank-template" class="report-card template-view d-none">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    <h3 class="fw-bold m-0" contenteditable="true">ITEM BANK & STUDENT RAW RESPONSE MATRIX</h3>
+                    <p class="text-muted m-0" contenteditable="true">Manage test questions, answer keys, and individual student options directly.</p>
+                </div>
+                <button class="btn btn-sm btn-outline-primary no-print" onclick="addRow('bank-table')"><i class="fas fa-plus me-1"></i> Add Item Record</button>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle" id="bank-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 70px;">ID</th>
+                            <th style="width: 300px;">Question Prompt / Item Description</th>
+                            <th style="width: 80px;">Key</th>
+                            <th style="width: 100px;">Student A Response</th>
+                            <th style="width: 100px;">Student B Response</th>
+                            <th style="width: 100px;">Student C Response</th>
+                            <th>Status Override</th>
+                            <th class="no-print" style="width: 50px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td contenteditable="true" class="editable-cell text-center fw-bold">Q-101</td>
+                            <td contenteditable="true" class="editable-cell">Which movement describes a transform fault boundary?</td>
+                            <td contenteditable="true" class="editable-cell text-center fw-bold text-primary">C</td>
+                            <td contenteditable="true" class="editable-cell text-center">C</td>
+                            <td contenteditable="true" class="editable-cell text-center">C</td>
+                            <td contenteditable="true" class="editable-cell text-center">A</td>
+                            <td contenteditable="true" class="editable-cell">Active - Validated</td>
+                            <td class="text-center no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteRow(this, 'bank-table')"><i class="fas fa-trash"></i></button></td>
+                        </tr>
+                        <tr>
+                            <td contenteditable="true" class="editable-cell text-center fw-bold">Q-102</td>
+                            <td contenteditable="true" class="editable-cell">Which geological feature forms at oceanic convergence?</td>
+                            <td contenteditable="true" class="editable-cell text-center fw-bold text-primary">B</td>
+                            <td contenteditable="true" class="editable-cell text-center">B</td>
+                            <td contenteditable="true" class="editable-cell text-center">D</td>
+                            <td contenteditable="true" class="editable-cell text-center">D</td>
+                            <td contenteditable="true" class="editable-cell">Needs Distractor Review</td>
+                            <td class="text-center no-print"><button class="btn btn-sm btn-outline-danger" onclick="deleteRow(this, 'bank-table')"><i class="fas fa-trash"></i></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    // Workspace Switching
+    function switchTemplate() {
+        const selected = document.getElementById('templateSelect').value;
+        document.querySelectorAll('.template-view').forEach(el => el.classList.add('d-none'));
+        document.getElementById(`${selected}-template`).classList.remove('d-none');
+    }
+
+    // Dynamic Calculations: Table of Specifications (TOS)
+    function calculateTOS() {
+        const rows = document.querySelectorAll('#tos-table tbody tr');
+        let totalHours = 0;
+        let totalAllocatedItems = 0;
+
+        rows.forEach(row => {
+            const hoursCell = row.querySelector('.hours-val');
+            const hours = parseFloat(hoursCell.innerText) || 0;
+            totalHours += hours;
+
+            // Count items entered in ranges (e.g., "1, 2, 3" -> 3 items)
+            let rowItems = 0;
+            const itemCells = row.querySelectorAll('.item-alloc');
+            itemCells.forEach(cell => {
+                const text = cell.innerText.trim();
+                if (text !== '') {
+                    const itemsArr = text.split(',').filter(x => x.trim() !== '');
+                    rowItems += itemsArr.length;
+                }
+            });
+            row.querySelector('.row-item-count').innerText = rowItems;
+            totalAllocatedItems += rowItems;
+        });
+
+        // Update Weights and Totals
+        rows.forEach(row => {
+            const hours = parseFloat(row.querySelector('.hours-val').innerText) || 0;
+            const weight = totalHours > 0 ? ((hours / totalHours) * 100).toFixed(1) : 0;
+            row.querySelector('.weight-val').innerText = `${weight}%`;
+        });
+
+        document.getElementById('total-hours').innerText = totalHours;
+        document.getElementById('total-weight').innerText = totalHours > 0 ? '100%' : '0%';
+        document.getElementById('total-items').innerText = totalAllocatedItems;
+    }
+
+    // Dynamic Calculations: Item Analysis Difficulty Index
+    function calculateItemAnalysis() {
+        const totalTakers = parseFloat(document.getElementById('total-takers').innerText) || 1;
+        const rows = document.querySelectorAll('#analysis-table tbody tr');
+
+        rows.forEach(row => {
+            const correctCell = row.querySelector('.correct-val');
+            const diffCell = row.querySelector('.diff-index');
+            const correctCount = parseFloat(correctCell.innerText) || 0;
+
+            const diffIndex = (correctCount / totalTakers).toFixed(2);
+            diffCell.innerText = diffIndex;
+        });
+    }
+
+    // Row Management (Add/Delete)
+    function addRow(tableId) {
+        const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+        const lastRow = table.rows[table.rows.length - 1];
+        const newRow = lastRow.cloneNode(true);
+        
+        // Reset cell values for clean input
+        newRow.querySelectorAll('.editable-cell').forEach(cell => {
+            if(cell.classList.contains('correct-val') || cell.classList.contains('hours-val')) {
+                cell.innerText = '0';
+            } else {
+                cell.innerText = 'New Data';
+            }
+        });
+
+        table.appendChild(newRow);
+        calculateTOS();
+        calculateItemAnalysis();
+    }
+
+    function deleteRow(btn, tableId) {
+        const table = document.getElementById(tableId).getElementsByTagName('tbody')[0];
+        if(table.rows.length > 1) {
+            const row = btn.closest('tr');
+            row.remove();
+            calculateTOS();
+            calculateItemAnalysis();
+        } else {
+            alert('At least one row must be retained in the report template.');
+        }
+    }
+
+    // Export Engine 1: Print
+    function printReport() {
+        window.print();
+    }
+
+    // Export Engine 2: Native PDF Generation
+    function exportPDF() {
+        const selectedTemplate = document.getElementById('templateSelect').value;
+        const element = document.querySelector(`#${selectedTemplate}-template`);
+        
+        const options = {
+            margin:       [8, 8, 8, 8],
+            filename:     `${selectedTemplate}_report.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 2, useCORS: true },
+            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+        };
+
+        html2pdf().set(options).from(element).save();
+    }
+
+    // Export Engine 3: Excel Worksheet Generation
+    function exportExcel() {
+        const selectedTemplate = document.getElementById('templateSelect').value;
+        const table = document.querySelector(`#${selectedTemplate}-template table`);
+        
+        const wb = XLSX.utils.table_to_book(table, { sheet: "Academic Report" });
+        XLSX.writeFile(wb, `${selectedTemplate}_exported_report.xlsx`);
+    }
+
+    // Export Engine 4: Microsoft Word Document Generation
+    function exportWord() {
+        const selectedTemplate = document.getElementById('templateSelect').value;
+        const htmlContent = document.querySelector(`#${selectedTemplate}-template`).innerHTML;
+        
+        const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Academic Report Export</title><style>table { border-collapse: collapse; width: 100%; } td, th { border: 1px solid #000; padding: 6px; text-align: center; }</style></head><body>";
+        const footer = "</body></html>";
+        const fullHtml = header + htmlContent + footer;
+
+        const blob = new Blob(['\ufeff', fullHtml], { type: 'application/msword' });
+        const downloadLink = document.createElement("a");
+        document.body.appendChild(downloadLink);
+        
+        if (navigator.msSaveOrOpenBlob) {
+            navigator.msSaveOrOpenBlob(blob, `${selectedTemplate}_exported_report.doc`);
+        } else {
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = `${selectedTemplate}_exported_report.doc`;
+            downloadLink.click();
+        }
+        
+        document.body.removeChild(downloadLink);
+    }
+
+    // Initialize calculations on page load
+    window.onload = function() {
+        calculateTOS();
+        calculateItemAnalysis();
+    };
+</script>
+
+</body>
+</html>
